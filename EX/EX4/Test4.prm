@@ -1,0 +1,11 @@
+#Name of the analyse
+ANAME Test
+#Phenotypes
+PFILE pheno.txt
+PHENO cs 2 3
+#Fixed effect definition
+FIXED mean 1 2
+#Genotype information
+POLYG 81 1
+GFILE geno1 geno2 geno3 geno4 geno5	
+HAPLO 10 47574 3
