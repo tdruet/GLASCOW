@@ -338,8 +338,10 @@ program GLMM
   ! Obtain (inverse) POLYG correlation data
   !---------------------------------------------------------------------!
 
-  rc=Get_Corr(p_p,corr,1) 
-  if (rc.gt.0) goto 994
+  CdtNoREML1:if(.not.SkipREML)then     
+   rc=Get_Corr(p_p,corr,1) 
+   if (rc.gt.0) goto 994
+  endif CdtNoREML1
 
   !---------------------------------------------------------------------!
   ! Step (a): solve without haplotype effect
@@ -355,6 +357,7 @@ program GLMM
   !---------------------------------------------------------------------!
   ! Check availability of inverse correlation matrices
   !---------------------------------------------------------------------!
+  CdtNoREML2:if(.not.SkipREML)then     
   if ((p_p%rfiles(1).ne.'I').and.(p_p%rifiles(1).eq.'I')) then
      is=p_p%dim_rnd(1)
      allocate(corr%inv_cor(is,is),stat=ok)
@@ -465,6 +468,7 @@ program GLMM
      enddo
      if(exportcorr)close(20)
   endif
+  endif CdtNoREML2
 
   !---------------------------------------------------------------------!
   ! Compute REML estimates of tau2 and sigma2(1)
@@ -2000,7 +2004,8 @@ contains
           open(20,file=trim(p_p%aname)//'.corr.polyg',err=992)
           do i=1,nb
              do j=i,nb
-                if (R(i,j).gt.0.0) write(20,*) i,j,R(i,j)
+!                if (R(i,j).gt.0.0) write(20,*) i,j,R(i,j)
+                write(20,*) i,j,R(i,j)
              enddo
           enddo
           close(20)
@@ -2224,7 +2229,8 @@ contains
              open(20,file=trim(p_p%aname)//'.corr.polyg')
              do Ani1=1,size(corr%dir_cor,1)
                 do Ani2=Ani1,size(corr%dir_cor,1)
-                   if (R(IAd(Ani1,Ani2)).gt.0.0) write(20,*)Ani1,Ani2,R(IAd(Ani1,Ani2))
+!                   if (R(IAd(Ani1,Ani2)).gt.0.0) write(20,*)Ani1,Ani2,R(IAd(Ani1,Ani2))
+                   write(20,*)Ani1,Ani2,R(IAd(Ani1,Ani2))
                 enddo
              enddo
              close(20)
@@ -2808,9 +2814,7 @@ contains
        oldid=0
 55     continue
        read(11,*,end=56) (dum1(i),i=1,p%datid)
-       print*,'Datid ::',p%datid,(dum1(p%datid))
        read(12,*,end=993) (dum2(i),i=1,p%hapid)
-       print*,'Hapid ::',p%hapid,(dum2(p%hapid))
 57     continue
        if (int(dum1(p%datid)).lt.int(dum2(p%hapid))) then
           if (int(dum1(p%datid)).eq.oldid) then
@@ -3510,7 +3514,7 @@ contains
        if(present(Id))then
           if(ircTyp>size(Id))cycle BLect !cas ou l'animal n'est pas connu (/a renumeroter)
           if(Id(ircTyp)>0)then
-             ircTyp=Id(ircTyp)
+!             ircTyp=Id(ircTyp)
           else
              cycle BLect !on passe à un autre enregistrement          
           endif
